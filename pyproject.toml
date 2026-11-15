@@ -1,0 +1,32 @@
+[project]
+name = "laya-playground"
+version = "0.1.0"
+description = "Ask Laya, a small decision model, typed questions about a text and watch the answers arrive."
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "laya>=0.4.28",
+    "python-dotenv>=1.0",
+    "uvicorn>=0.30",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.27",
+    "mypy>=1.11",
+    "pytest>=8.3",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+pythonpath = ["backend"]
+
+[tool.mypy]
+strict = true
+mypy_path = "backend"
+explicit_package_bases = true
+
+# laya ships without type hints
+[[tool.mypy.overrides]]
+module = ["laya"]
+ignore_missing_imports = true
