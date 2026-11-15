@@ -1,5 +1,6 @@
 # Laya playground
 
+[![Licence: Apache 2.0](https://img.shields.io/badge/licence-Apache_2.0-blue)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)](pyproject.toml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688?logo=fastapi&logoColor=white)](backend/app.py)
 [![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](frontend/package.json)
@@ -39,3 +40,9 @@ make app     # opens at http://127.0.0.1:8100
 | [API](docs/api.md) | The streaming endpoints, with curl examples |
 | [Development](docs/development.md) | Commands, project layout, conventions and common changes |
 | [Troubleshooting](docs/troubleshooting.md) | Common problems and their fixes |
+
+## Licence
+
+Copyright 2026 Amir Douzandeh. Licensed under the [Apache License 2.0](LICENSE).
+
+The models are downloaded separately and keep their own licences: [Laya](https://huggingface.co/convaiinnovations/laya) is Apache 2.0, and the default chat model, [Gemma 3 4B abliterated](https://huggingface.co/mlabonne/gemma-3-4b-it-abliterated-GGUF), is under the [Gemma Terms of Use](https://ai.google.dev/gemma/terms).
