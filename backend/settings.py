@@ -9,8 +9,15 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_MODEL_PATH = "../z-image-inference/models/laya"
-CHECKPOINT_FILE = "rl_agent_config.json"
+DEFAULT_MODEL_PATH = "models/laya"
+# Laya's English checkpoint: every file it needs to load, so a half-finished download never counts as found
+CHECKPOINT_FILES = (
+    "rl_agent_config.json",
+    "model.safetensors",
+    "tokenizer/tokenizer.json",
+    "tokenizer/tokenizer_config.json",
+    "encoder/config.json",
+)
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
 DEFAULT_OLLAMA_KEEP_ALIVE = "5m"
 # What Ollama's keep_alive takes: seconds, or a duration such as 30s, 5m or 1h; a negative value keeps it loaded
@@ -40,6 +47,10 @@ def ollama_keep_alive() -> str | int:
     return int(text) if text.lstrip("-").isdigit() else text
 
 
+def checkpoint_complete(path: Path) -> bool:
+    return all((path / name).is_file() for name in CHECKPOINT_FILES)
+
+
 @dataclass(frozen=True)
 class Settings:
     model_path: Path
@@ -50,7 +61,7 @@ class Settings:
 
     @property
     def model_found(self) -> bool:
-        return (self.model_path / CHECKPOINT_FILE).is_file()
+        return checkpoint_complete(self.model_path)
 
 
 def load_settings() -> Settings:

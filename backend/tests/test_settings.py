@@ -12,10 +12,10 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv(name, raising=False)
 
 
-def test_defaults_to_the_copy_z_image_already_has() -> None:
+def test_defaults_to_the_projects_own_models_folder() -> None:
     settings = load_settings()
 
-    assert settings.model_path == (ROOT / "../z-image-inference/models/laya").resolve()
+    assert settings.model_path == (ROOT / "models/laya").resolve()
     assert settings.keep_alive == 300
     assert settings.threads == 8
 
