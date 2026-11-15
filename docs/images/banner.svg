@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="-apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif">
+  <!-- The README banner, rendered to banner.jpg at 2880 by 1800; see "The banner" in docs/development.md -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22134d"/>
+      <stop offset="0.55" stop-color="#140c2e"/>
+      <stop offset="1" stop-color="#1c0f35"/>
+    </linearGradient>
+    <radialGradient id="glowLeft" cx="0.18" cy="0.2" r="0.55">
+      <stop offset="0" stop-color="#6d4aff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#6d4aff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowRight" cx="0.8" cy="0.55" r="0.5">
+      <stop offset="0" stop-color="#c026d3" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#c026d3" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="titleWord" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c4b5fd"/>
+      <stop offset="1" stop-color="#f0abfc"/>
+    </linearGradient>
+    <linearGradient id="winnerBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+    <clipPath id="answerCard"><rect width="460" height="330" rx="22"/></clipPath>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#05020f" flood-opacity="0.55"/>
+    </filter>
+    <filter id="iconShadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#7c3aed" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1440" height="900" fill="url(#bg)"/>
+  <rect width="1440" height="900" fill="url(#glowLeft)"/>
+  <rect width="1440" height="900" fill="url(#glowRight)"/>
+
+  <!-- App icon: the playground's sparkle mark -->
+  <g transform="translate(100 232)" filter="url(#iconShadow)">
+    <rect width="132" height="132" rx="32" fill="url(#brand)"/>
+    <g transform="translate(30 30) scale(3)" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+      <path d="M20 3v4M22 5h-4M4 17v2M5 18H3"/>
+    </g>
+  </g>
+
+  <!-- Title -->
+  <text x="262" y="292" font-size="70" font-weight="700" fill="#ffffff" letter-spacing="-1.5">Laya</text>
+  <text x="262" y="364" font-size="70" font-weight="700" fill="url(#titleWord)" letter-spacing="-1.5">Playground</text>
+  <text x="264" y="402" font-size="15" font-weight="600" fill="#c4b5fd" fill-opacity="0.8" letter-spacing="2.4">LOCAL · PRIVATE · STREAMED</text>
+
+  <!-- Headline -->
+  <text x="100" y="482" font-size="29" fill="#f5f3ff">Ask a decision model. Chat with a local LLM.</text>
+  <text x="100" y="520" font-size="29" fill="#a5a1cc">Nothing leaves your machine.</text>
+
+  <!-- Feature chips -->
+  <g font-size="16.5" fill="#e9e5ff">
+    <g transform="translate(100 562)">
+      <rect width="240" height="40" rx="20" fill="#ffffff" fill-opacity="0.07" stroke="#ffffff" stroke-opacity="0.14"/>
+      <circle cx="20" cy="20" r="4.5" fill="#a78bfa"/>
+      <text x="34" y="26">Yes / No · Choice · Score</text>
+    </g>
+    <g transform="translate(352 562)">
+      <rect width="150" height="40" rx="20" fill="#ffffff" fill-opacity="0.07" stroke="#ffffff" stroke-opacity="0.14"/>
+      <circle cx="20" cy="20" r="4.5" fill="#e879f9"/>
+      <text x="34" y="26">Live streaming</text>
+    </g>
+    <g transform="translate(514 562)">
+      <rect width="136" height="40" rx="20" fill="#ffffff" fill-opacity="0.07" stroke="#ffffff" stroke-opacity="0.14"/>
+      <circle cx="20" cy="20" r="4.5" fill="#22d3ee"/>
+      <text x="34" y="26">Ollama chat</text>
+    </g>
+    <g transform="translate(100 614)">
+      <rect width="138" height="40" rx="20" fill="#ffffff" fill-opacity="0.07" stroke="#ffffff" stroke-opacity="0.14"/>
+      <circle cx="20" cy="20" r="4.5" fill="#fbbf24"/>
+      <text x="34" y="26">Light &amp; dark</text>
+    </g>
+    <g transform="translate(250 614)">
+      <rect width="204" height="40" rx="20" fill="#ffffff" fill-opacity="0.07" stroke="#ffffff" stroke-opacity="0.14"/>
+      <circle cx="20" cy="20" r="4.5" fill="#34d399"/>
+      <text x="34" y="26">One-command setup</text>
+    </g>
+    <g transform="translate(466 614)">
+      <rect width="166" height="40" rx="20" fill="#ffffff" fill-opacity="0.07" stroke="#ffffff" stroke-opacity="0.14"/>
+      <circle cx="20" cy="20" r="4.5" fill="#fb7185"/>
+      <text x="34" y="26">FastAPI + React</text>
+    </g>
+  </g>
+
+  <!-- Models -->
+  <text x="100" y="786" font-size="15.5" fill="#8f8ab8">Laya 421M  ·  Gemma 3 4B  ·  Ollama  ·  FastAPI  ·  React</text>
+
+  <!-- Chat card (behind) -->
+  <g transform="translate(790 78) rotate(-5 240 150)" filter="url(#shadow)">
+    <rect width="480" height="300" rx="22" fill="#16141f" stroke="#ffffff" stroke-opacity="0.1"/>
+    <text x="26" y="40" font-size="15" font-weight="600" fill="#ececf1">Conversation</text>
+    <rect x="300" y="22" width="156" height="26" rx="13" fill="#6366f1" fill-opacity="0.18"/>
+    <circle cx="316" cy="35" r="3.5" fill="#818cf8"/>
+    <text x="326" y="40" font-size="12.5" fill="#c7d2fe">gemma-3-4b · Q4</text>
+    <line x1="0" y1="64" x2="480" y2="64" stroke="#ffffff" stroke-opacity="0.08"/>
+    <!-- User bubble -->
+    <rect x="150" y="86" width="262" height="44" rx="16" fill="#5558e6"/>
+    <text x="168" y="113" font-size="14.5" fill="#ffffff">Write a haiku about a quiet garden.</text>
+    <circle cx="438" cy="108" r="15" fill="#2a2836"/>
+    <!-- Model bubble -->
+    <circle cx="42" cy="168" r="15" fill="url(#brand)"/>
+    <rect x="68" y="148" width="300" height="104" rx="16" fill="#1f1d2b" stroke="#ffffff" stroke-opacity="0.08"/>
+    <g font-size="14.5" fill="#ececf1">
+      <text x="86" y="178">Moss on the old stones,</text>
+      <text x="86" y="203">rain hushes the cedar path,</text>
+      <text x="86" y="228">a bell, then nothing</text>
+    </g>
+    <rect x="223" y="215" width="7" height="17" rx="2" fill="#818cf8"/>
+  </g>
+
+  <!-- Answer card (front) -->
+  <g transform="translate(892 352) rotate(3 230 170)" filter="url(#shadow)">
+    <rect width="460" height="330" rx="22" fill="#16141f" stroke="#ffffff" stroke-opacity="0.12"/>
+    <rect x="0" y="0" width="5" height="330" fill="#8b5cf6" clip-path="url(#answerCard)"/>
+    <rect x="24" y="24" width="44" height="24" rx="7" fill="#8b5cf6" fill-opacity="0.18"/>
+    <text x="34" y="41" font-size="13" font-weight="700" fill="#c4b5fd">Q1</text>
+    <text x="80" y="41" font-size="14.5" fill="#a3a6b4">What is the message about?</text>
+    <text x="400" y="41" font-size="12.5" fill="#878b9c">112 ms</text>
+    <!-- Winner -->
+    <text x="24" y="94" font-size="27" font-weight="700" fill="#ffffff" letter-spacing="-0.5">delivery</text>
+    <rect x="150" y="74" width="132" height="26" rx="13" fill="#6366f1" fill-opacity="0.18"/>
+    <text x="164" y="92" font-size="12.5" fill="#c7d2fe">confidence 77%</text>
+    <!-- Bars -->
+    <g font-size="14.5">
+      <text x="24" y="146" fill="#a3a6b4">billing</text>
+      <rect x="130" y="137" width="250" height="9" rx="4.5" fill="#262833"/>
+      <rect x="130" y="137" width="8" height="9" rx="4.5" fill="#4a4d5e"/>
+      <text x="436" y="146" fill="#878b9c" text-anchor="end">3%</text>
+
+      <text x="24" y="188" fill="#ffffff" font-weight="600">delivery</text>
+      <rect x="130" y="179" width="250" height="9" rx="4.5" fill="#262833"/>
+      <rect x="130" y="179" width="235" height="9" rx="4.5" fill="url(#winnerBar)"/>
+      <text x="436" y="188" fill="#ffffff" text-anchor="end" font-weight="600">94%</text>
+
+      <text x="24" y="230" fill="#a3a6b4">account</text>
+      <rect x="130" y="221" width="250" height="9" rx="4.5" fill="#262833"/>
+      <rect x="130" y="221" width="8" height="9" rx="4.5" fill="#4a4d5e"/>
+      <text x="436" y="230" fill="#878b9c" text-anchor="end">3%</text>
+    </g>
+    <line x1="24" y1="262" x2="436" y2="262" stroke="#ffffff" stroke-opacity="0.08"/>
+    <circle cx="32" cy="290" r="4" fill="#34d399"/>
+    <text x="44" y="295" font-size="13" fill="#a3a6b4">Answered in 1.6 s, streamed one by one</text>
+  </g>
+
+  <!-- Input bar -->
+  <g transform="translate(760 742)" filter="url(#shadow)">
+    <rect width="600" height="66" rx="33" fill="#120f1f" fill-opacity="0.9" stroke="#ffffff" stroke-opacity="0.16"/>
+    <text x="32" y="40" font-size="17" fill="#d6d3f0">Is the customer asking for a refund?</text>
+    <rect x="474" y="9" width="116" height="48" rx="24" fill="url(#brand)"/>
+    <text x="532" y="39" font-size="17" font-weight="600" fill="#ffffff" text-anchor="middle">Ask</text>
+  </g>
+</svg>
