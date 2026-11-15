@@ -1,7 +1,98 @@
 @import "tailwindcss";
 
+/* Dark mode follows the `dark` class on <html> (set by lib/theme from the System / Light / Dark switch), not only the OS */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Semantic colours: components use these names, never raw greys, so both themes stay in step from one place */
+@theme inline {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-text: var(--accent-text);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-fg: var(--accent-soft-fg);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --animate-rise: rise 0.35s ease-out both;
+  --animate-grow: grow 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes grow {
+  from {
+    width: 0;
+  }
+}
+
+:root {
+  color-scheme: light;
+  --canvas: #f6f6fa;
+  --surface: #ffffff;
+  --sunken: #f0f1f6;
+  --line: #e3e4eb;
+  --line-strong: #cdd0da;
+  --fg: #15161c;
+  --muted: #5b5f6e;
+  --subtle: #686c7c;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-text: #4338ca;
+  --accent-soft: #eef0ff;
+  --accent-soft-fg: #3730a3;
+  --success: #047857;
+  --warning: #b45309;
+  --danger: #b91c1c;
+  --danger-soft: #fef2f2;
+}
+
+.dark {
+  color-scheme: dark;
+  --canvas: #0a0b0f;
+  --surface: #13141a;
+  --sunken: #1a1c24;
+  --line: #262833;
+  --line-strong: #363948;
+  --fg: #ececf1;
+  --muted: #a3a6b4;
+  --subtle: #878b9c;
+  --accent: #5558e6;
+  --accent-hover: #6366f1;
+  --accent-text: #a5b4fc;
+  --accent-soft: rgb(99 102 241 / 0.16);
+  --accent-soft-fg: #c7d2fe;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --danger-soft: rgb(248 113 113 / 0.12);
+}
+
+body {
+  background: var(--canvas);
+  color: var(--fg);
+}
+
 .lucide {
   width: 1rem;
   height: 1rem;
   stroke-width: 2;
+  flex-shrink: 0;
 }

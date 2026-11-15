@@ -1,7 +1,8 @@
-import { Copy, Trash2 } from "lucide-react";
-import { QUESTION_TYPES, questionProblem, type QuestionDraft } from "../lib/questions";
+import { CircleAlert, Copy, Trash2 } from "lucide-react";
+import { QUESTION_TYPES, questionProblem, type QuestionDraft, type QuestionType } from "../lib/questions";
 import { OptionChips } from "./OptionChips";
-import { cardClass, fieldClass, iconButtonClass } from "./ui";
+import { QUESTION_STYLE, TypeBadge } from "./questionStyle";
+import { fieldClass, IconButton, SegmentedControl } from "./ui";
 
 interface Props {
   number: number;
@@ -9,25 +10,6 @@ interface Props {
   onChange: (question: QuestionDraft) => void;
   onDuplicate: () => void;
   onRemove: () => void;
-}
-
-function TypeSwitch({ question, onChange }: Pick<Props, "question" | "onChange">) {
-  return (
-    <div role="radiogroup" aria-label="Answer type" className="inline-flex rounded-lg bg-stone-100 p-0.5 dark:bg-stone-800">
-      {QUESTION_TYPES.map((type) => (
-        <button
-          key={type.value}
-          type="button"
-          role="radio"
-          aria-checked={question.type === type.value}
-          onClick={() => onChange({ ...question, type: type.value })}
-          className="rounded-md px-2.5 py-1 text-xs font-medium text-stone-600 aria-checked:bg-white aria-checked:text-stone-900 aria-checked:shadow-sm dark:text-stone-300 dark:aria-checked:bg-stone-950 dark:aria-checked:text-stone-100 pointer-coarse:py-2.5"
-        >
-          {type.label}
-        </button>
-      ))}
-    </div>
-  );
 }
 
 function Answers({ question, onChange }: Pick<Props, "question" | "onChange">) {
@@ -38,7 +20,7 @@ function Answers({ question, onChange }: Pick<Props, "question" | "onChange">) {
         descriptions
         options={question.options}
         onChange={(options) => onChange({ ...question, options })}
-        placeholder="Type an option, Enter to add (label: optional description)"
+        placeholder="Type an option and press Enter (label: optional description)"
       />
     );
   }
@@ -49,7 +31,7 @@ function Answers({ question, onChange }: Pick<Props, "question" | "onChange">) {
         descriptions={false}
         options={question.levels.map((level) => ({ label: level, description: "" }))}
         onChange={(levels) => onChange({ ...question, levels: levels.map((level) => level.label) })}
-        placeholder="Type a level, Enter to add"
+        placeholder="Type a level and press Enter"
       />
     );
   }
@@ -73,31 +55,49 @@ function Answers({ question, onChange }: Pick<Props, "question" | "onChange">) {
   );
 }
 
+const TYPE_SEGMENTS = QUESTION_TYPES.map((type) => ({ value: type.value, label: type.label, icon: QUESTION_STYLE[type.value].icon }));
+
 export function QuestionCard({ number, question, onChange, onDuplicate, onRemove }: Props) {
   const problem = questionProblem(question);
   return (
-    <section aria-label={`Question ${number}`} className={`${cardClass} space-y-3`}>
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm font-semibold text-stone-500">Q{number}</span>
-        <TypeSwitch question={question} onChange={onChange} />
+    <section
+      aria-label={`Question ${number}`}
+      className="relative overflow-hidden rounded-xl border border-line bg-surface p-4 pl-5 shadow-xs transition-shadow focus-within:shadow-md motion-safe:animate-rise"
+    >
+      <span aria-hidden className={`absolute inset-y-0 left-0 w-1 ${QUESTION_STYLE[question.type].stripe}`} />
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <TypeBadge type={question.type} number={number} />
+        <SegmentedControl<QuestionType>
+          label="Answer type"
+          size="sm"
+          segments={TYPE_SEGMENTS}
+          value={question.type}
+          onChange={(type) => onChange({ ...question, type })}
+        />
         <div className="ml-auto flex">
-          <button type="button" className={iconButtonClass} aria-label={`Duplicate question ${number}`} title="Duplicate" onClick={onDuplicate}>
+          <IconButton label={`Duplicate question ${number}`} onClick={onDuplicate}>
             <Copy className="lucide" />
-          </button>
-          <button type="button" className={iconButtonClass} aria-label={`Remove question ${number}`} title="Remove" onClick={onRemove}>
+          </IconButton>
+          <IconButton label={`Remove question ${number}`} onClick={onRemove} className="hover:text-danger">
             <Trash2 className="lucide" />
-          </button>
+          </IconButton>
         </div>
       </div>
-      <input
-        className={fieldClass}
-        aria-label={`Question ${number}`}
-        placeholder="What should Laya decide? e.g. Is the customer asking for a refund?"
-        value={question.instruction}
-        onChange={(event) => onChange({ ...question, instruction: event.target.value })}
-      />
-      <Answers question={question} onChange={onChange} />
-      {problem && <p className="text-xs text-amber-700 dark:text-amber-400">{problem}</p>}
+      <div className="space-y-3">
+        <input
+          className={fieldClass}
+          aria-label={`Question ${number}`}
+          placeholder="What should Laya decide? e.g. Is the customer asking for a refund?"
+          value={question.instruction}
+          onChange={(event) => onChange({ ...question, instruction: event.target.value })}
+        />
+        <Answers question={question} onChange={onChange} />
+        {problem && (
+          <p className="flex items-center gap-1.5 text-xs text-warning">
+            <CircleAlert className="lucide size-3.5!" /> {problem}
+          </p>
+        )}
+      </div>
     </section>
   );
 }

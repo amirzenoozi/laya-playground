@@ -6,6 +6,8 @@ import { QUESTION_TYPES, type QuestionDraft } from "./questions";
 const DRAFT_KEY = "laya-playground:draft";
 const CHAT_KEY = "laya-playground:chat";
 const TAB_KEY = "laya-playground:tab";
+// index.html reads this key too, to apply the theme before the first paint
+const THEME_KEY = "laya-playground:theme";
 
 export interface Draft {
   text: string;
@@ -18,6 +20,8 @@ export interface SavedChat {
 }
 
 export type Tab = "decide" | "chat";
+
+export type ThemeChoice = "system" | "light" | "dark";
 
 function read<T>(key: string, check: (value: unknown) => value is T): T | null {
   try {
@@ -64,6 +68,7 @@ function isSavedChat(value: unknown): value is SavedChat {
 }
 
 const isTab = (value: unknown): value is Tab => value === "decide" || value === "chat";
+const isTheme = (value: unknown): value is ThemeChoice => value === "system" || value === "light" || value === "dark";
 
 export const loadDraft = () => read(DRAFT_KEY, isDraft);
 export const saveDraft = (draft: Draft) => write(DRAFT_KEY, draft);
@@ -71,3 +76,5 @@ export const loadChat = () => read(CHAT_KEY, isSavedChat);
 export const saveChat = (chat: SavedChat) => write(CHAT_KEY, chat);
 export const loadTab = () => read(TAB_KEY, isTab);
 export const saveTab = (tab: Tab) => write(TAB_KEY, tab);
+export const loadTheme = () => read(THEME_KEY, isTheme);
+export const saveTheme = (theme: ThemeChoice) => write(THEME_KEY, theme);

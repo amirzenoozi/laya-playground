@@ -210,4 +210,43 @@ describe("ChatPage", () => {
     expect(screen.getByText("One name")).toBeInTheDocument();
     expect(screen.getByText("Fern.")).toBeInTheDocument();
   });
+
+  it("starts a chat from an example prompt", async () => {
+    const fetchMock = mockServer(() => {
+      const stream = controlledStream();
+      stream.send("token", { text: "Moss and stone." });
+      stream.send("done", { first_token_ms: 1, total_ms: 2, tokens: 3 });
+      stream.close();
+      return stream.response();
+    });
+    const user = userEvent.setup();
+    render(<ChatPage />);
+    await ready();
+
+    await user.click(screen.getByRole("button", { name: "Write a haiku about a quiet garden." }));
+
+    expect(await screen.findByText("Moss and stone.")).toBeInTheDocument();
+    expect(sentBodies(fetchMock)[0].messages).toEqual([{ role: "user", content: "Write a haiku about a quiet garden." }]);
+  });
+
+  it("copies a finished reply", async () => {
+    mockServer(() => {
+      const stream = controlledStream();
+      stream.send("token", { text: "Fern." });
+      stream.send("done", { first_token_ms: 1, total_ms: 2, tokens: 1 });
+      stream.close();
+      return stream.response();
+    });
+    const user = userEvent.setup();
+    render(<ChatPage />);
+    await ready();
+    await user.type(screen.getByRole("textbox", { name: "Message" }), "One name{Enter}");
+    await screen.findByText("Fern.");
+
+    await user.click(screen.getByRole("button", { name: "Copy reply" }));
+
+    // user-event gives each test its own clipboard
+    expect(await navigator.clipboard.readText()).toBe("Fern.");
+    expect(await screen.findByRole("button", { name: "Copied" })).toBeInTheDocument();
+  });
 });

@@ -1,9 +1,5 @@
-import { Braces, Check, Plus, Send, Square } from "lucide-react";
+import { Braces, Check, Copy, MessageSquareText, Plus, Send, Square, Telescope } from "lucide-react";
 import { useEffect, useState, type KeyboardEvent } from "react";
-import { AnswersPanel } from "./AnswersPanel";
-import { QuestionCard } from "./QuestionCard";
-import { StatusPill } from "./StatusPill";
-import { fieldClass, primaryButtonClass, secondaryButtonClass } from "./ui";
 import {
   askBody,
   askProblem,
@@ -17,22 +13,21 @@ import {
 } from "../lib/questions";
 import { loadDraft, saveDraft } from "../lib/storage";
 import { useAsk } from "../lib/useAsk";
+import { useCopy } from "../lib/useCopy";
+import { AnswersPanel, RunBadge } from "./AnswersPanel";
+import { QuestionCard } from "./QuestionCard";
+import { StatusPill } from "./StatusPill";
+import { Button, Card, fieldClass, labelClass } from "./ui";
 
 function JsonView({ text, questions }: { text: string; questions: QuestionDraft[] }) {
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useCopy();
   const json = JSON.stringify(askBody(text, questions), null, 2);
-  const copy = () => {
-    void navigator.clipboard?.writeText(json).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    });
-  };
   return (
-    <div className="relative">
-      <button type="button" onClick={copy} className={`${secondaryButtonClass} absolute top-2 right-2 bg-white dark:bg-stone-900`}>
-        {copied ? <Check className="lucide" /> : <Braces className="lucide" />} {copied ? "Copied" : "Copy"}
-      </button>
-      <pre aria-label="Request JSON" className="max-h-80 overflow-auto rounded-lg bg-stone-900 p-4 text-xs text-stone-100">
+    <div className="relative motion-safe:animate-rise">
+      <Button size="sm" onClick={() => copy(json)} icon={copied ? <Check className="lucide" /> : <Copy className="lucide" />} className="absolute top-2 right-2">
+        {copied ? "Copied" : "Copy"}
+      </Button>
+      <pre aria-label="Request JSON" className="max-h-80 overflow-auto rounded-xl border border-line bg-sunken p-4 font-mono text-xs leading-relaxed text-fg">
         {json}
       </pre>
     </div>
@@ -45,6 +40,19 @@ function useDraft() {
   const [questions, setQuestions] = useState<QuestionDraft[]>(saved?.questions ?? [blankQuestion()]);
   useEffect(() => saveDraft({ text, questions }), [text, questions]);
   return { text, setText, questions, setQuestions };
+}
+
+function Templates({ disabled, onPick }: { disabled: boolean; onPick: (question: QuestionDraft) => void }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className={labelClass}>Start from</span>
+      {TEMPLATES.map((template) => (
+        <Button key={template.name} size="sm" disabled={disabled} onClick={() => onPick(fromTemplate(template))}>
+          {template.name}
+        </Button>
+      ))}
+    </div>
+  );
 }
 
 export function DecidePage() {
@@ -68,42 +76,28 @@ export function DecidePage() {
   };
 
   return (
-    <div onKeyDown={onKeyDown}>
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <p className="text-sm text-stone-500">Ask Laya, a small decision model, typed questions about a text.</p>
-        <div className="ml-auto">
-          <StatusPill refresh={run.phase} />
+    <div onKeyDown={onKeyDown} className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+      <Card title="Ask" icon={<MessageSquareText className="lucide" />} actions={<StatusPill refresh={run.phase} />} bodyClassName="space-y-5 p-4 sm:p-5">
+        <div className="space-y-1.5">
+          <label htmlFor="text" className={`flex justify-between ${labelClass}`}>
+            Text to judge
+            <span className="font-normal text-subtle tabular-nums">
+              {text.length.toLocaleString()} / {MAX_TEXT.toLocaleString()}
+            </span>
+          </label>
+          <textarea
+            id="text"
+            rows={5}
+            className={`${fieldClass} resize-y leading-relaxed`}
+            placeholder="Paste a message, a review, a prompt…"
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+          />
         </div>
-      </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section aria-label="Ask" className="space-y-4">
-          <div>
-            <label htmlFor="text" className="mb-1 flex justify-between text-sm font-medium">
-              Text to judge
-              <span className="font-normal tabular-nums text-stone-500">
-                {text.length.toLocaleString()} / {MAX_TEXT.toLocaleString()}
-              </span>
-            </label>
-            <textarea
-              id="text"
-              rows={6}
-              className={fieldClass}
-              placeholder="Paste a message, a review, a prompt…"
-              value={text}
-              onChange={(event) => setText(event.target.value)}
-            />
-          </div>
+        <Templates disabled={full} onPick={add} />
 
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium text-stone-500">Start from</span>
-            {TEMPLATES.map((template) => (
-              <button key={template.name} type="button" disabled={full} className={secondaryButtonClass} onClick={() => add(fromTemplate(template))}>
-                {template.name}
-              </button>
-            ))}
-          </div>
-
+        <div className="space-y-3">
           {questions.map((question, index) => (
             <QuestionCard
               key={question.id}
@@ -114,34 +108,37 @@ export function DecidePage() {
               onRemove={() => remove(index)}
             />
           ))}
-
-          <button type="button" disabled={full} className={secondaryButtonClass} onClick={() => add(blankQuestion())}>
+          <button
+            type="button"
+            disabled={full}
+            onClick={() => add(blankQuestion())}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-line-strong py-3 text-sm font-medium text-muted transition-colors hover:border-accent hover:bg-accent-soft hover:text-accent-text focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+          >
             <Plus className="lucide" /> Add question {full && `(at most ${MAX_QUESTIONS})`}
           </button>
+        </div>
 
-          <div className="flex flex-wrap items-center gap-3 border-t border-stone-200 pt-4 dark:border-stone-800">
-            {running ? (
-              <button type="button" className={primaryButtonClass} onClick={stop}>
-                <Square className="lucide" /> Stop
-              </button>
-            ) : (
-              <button type="button" className={primaryButtonClass} disabled={problem !== null} onClick={send} title="Ask (⌘ Enter)">
-                <Send className="lucide" /> Ask
-              </button>
-            )}
-            <button type="button" className={secondaryButtonClass} aria-pressed={showJson} onClick={() => setShowJson(!showJson)}>
-              <Braces className="lucide" /> JSON
-            </button>
-            {problem && <span className="text-sm text-stone-500">{problem}</span>}
-          </div>
-          {showJson && <JsonView text={text} questions={questions} />}
-        </section>
+        <div className="flex flex-wrap items-center gap-3 border-t border-line pt-4">
+          {running ? (
+            <Button variant="primary" onClick={stop} icon={<Square className="lucide" />}>
+              Stop
+            </Button>
+          ) : (
+            <Button variant="primary" disabled={problem !== null} onClick={send} title="Ask (⌘ Enter)" icon={<Send className="lucide" />}>
+              Ask
+            </Button>
+          )}
+          <Button variant="ghost" aria-pressed={showJson} onClick={() => setShowJson(!showJson)} icon={<Braces className="lucide" />} className="aria-pressed:bg-sunken aria-pressed:text-fg">
+            JSON
+          </Button>
+          {problem ? <span className="text-sm text-muted">{problem}</span> : <kbd className="ml-auto hidden font-mono text-xs text-subtle sm:inline">⌘ Enter</kbd>}
+        </div>
+        {showJson && <JsonView text={text} questions={questions} />}
+      </Card>
 
-        <section aria-label="Answers" className="lg:sticky lg:top-4 lg:self-start">
-          <h2 className="mb-3 text-sm font-medium">Answers</h2>
-          <AnswersPanel run={run} onRetry={retry} />
-        </section>
-      </div>
+      <Card title="Answers" icon={<Telescope className="lucide" />} actions={<RunBadge run={run} />} className="lg:sticky lg:top-20">
+        <AnswersPanel run={run} onRetry={retry} />
+      </Card>
     </div>
   );
 }
