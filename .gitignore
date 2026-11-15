@@ -10,3 +10,12 @@ frontend/dist/
 .DS_Store
 .obsidian/
 frontend/tsconfig.tsbuildinfo
+
+# Editors
+.idea/
+.vscode/
+
+# Test coverage and stray logs
+coverage/
+.coverage
+*.log
