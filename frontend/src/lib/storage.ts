@@ -1,37 +1,73 @@
-// Remembers the last text and questions in this browser; storage that is blocked or holds something broken is ignored.
+// Remembers each tab's last state in this browser; storage that is blocked or holds something broken is ignored.
 
+import type { ChatMessage, ChatSettings } from "./chat";
 import { QUESTION_TYPES, type QuestionDraft } from "./questions";
 
-const KEY = "laya-playground:draft";
+const DRAFT_KEY = "laya-playground:draft";
+const CHAT_KEY = "laya-playground:chat";
+const TAB_KEY = "laya-playground:tab";
 
 export interface Draft {
   text: string;
   questions: QuestionDraft[];
 }
 
-function isQuestion(value: unknown): value is QuestionDraft {
-  if (typeof value !== "object" || value === null) return false;
-  const question = value as Partial<QuestionDraft>;
-  const knownType = QUESTION_TYPES.some((type) => type.value === question.type);
-  return knownType && typeof question.instruction === "string" && Array.isArray(question.options) && Array.isArray(question.levels);
+export interface SavedChat {
+  settings: ChatSettings;
+  messages: ChatMessage[];
 }
 
-export function loadDraft(): Draft | null {
+export type Tab = "decide" | "chat";
+
+function read<T>(key: string, check: (value: unknown) => value is T): T | null {
   try {
-    const saved: unknown = JSON.parse(localStorage.getItem(KEY) ?? "null");
-    if (typeof saved !== "object" || saved === null) return null;
-    const { text, questions } = saved as Partial<Draft>;
-    if (typeof text !== "string" || !Array.isArray(questions) || !questions.every(isQuestion)) return null;
-    return { text, questions };
+    const saved: unknown = JSON.parse(localStorage.getItem(key) ?? "null");
+    return check(saved) ? saved : null;
   } catch {
     return null;
   }
 }
 
-export function saveDraft(draft: Draft): void {
+function write(key: string, value: unknown): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify(draft));
+    localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    // Private mode or full storage: the draft just is not remembered
+    // Private mode or full storage: it just is not remembered
   }
 }
+
+const isObject = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+
+function isQuestion(value: unknown): value is QuestionDraft {
+  if (!isObject(value)) return false;
+  const knownType = QUESTION_TYPES.some((type) => type.value === value.type);
+  return knownType && typeof value.instruction === "string" && Array.isArray(value.options) && Array.isArray(value.levels);
+}
+
+function isDraft(value: unknown): value is Draft {
+  return isObject(value) && typeof value.text === "string" && Array.isArray(value.questions) && value.questions.every(isQuestion);
+}
+
+function isMessage(value: unknown): value is ChatMessage {
+  return isObject(value) && (value.role === "user" || value.role === "assistant") && typeof value.content === "string";
+}
+
+const isNumberOrNull = (value: unknown): boolean => value === null || typeof value === "number";
+
+function isChatSettings(value: unknown): value is ChatSettings {
+  if (!isObject(value) || typeof value.model !== "string" || typeof value.system !== "string") return false;
+  return isNumberOrNull(value.temperature) && isNumberOrNull(value.maxTokens);
+}
+
+function isSavedChat(value: unknown): value is SavedChat {
+  return isObject(value) && isChatSettings(value.settings) && Array.isArray(value.messages) && value.messages.every(isMessage);
+}
+
+const isTab = (value: unknown): value is Tab => value === "decide" || value === "chat";
+
+export const loadDraft = () => read(DRAFT_KEY, isDraft);
+export const saveDraft = (draft: Draft) => write(DRAFT_KEY, draft);
+export const loadChat = () => read(CHAT_KEY, isSavedChat);
+export const saveChat = (chat: SavedChat) => write(CHAT_KEY, chat);
+export const loadTab = () => read(TAB_KEY, isTab);
+export const saveTab = (tab: Tab) => write(TAB_KEY, tab);

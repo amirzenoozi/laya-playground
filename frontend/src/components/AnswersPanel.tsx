@@ -1,6 +1,6 @@
 import { CircleAlert, LoaderCircle, RotateCcw } from "lucide-react";
 import { answerLabels, type QuestionBody } from "../lib/questions";
-import type { Answer } from "../lib/stream";
+import type { Answer } from "../lib/laya";
 import type { Run } from "../lib/useAsk";
 import { cardClass, secondaryButtonClass } from "./ui";
 

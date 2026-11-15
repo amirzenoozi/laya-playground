@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { App } from "./App";
+import { DecidePage } from "./DecidePage";
 
 // A response body the test feeds one event at a time, to see the UI between them.
 function controlledStream() {
@@ -28,7 +28,7 @@ async function writeYesNoQuestion(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByRole("textbox", { name: "Question 1" }), "Is the writer unhappy?");
 }
 
-describe("App", () => {
+describe("DecidePage", () => {
   beforeEach(() => localStorage.clear());
   afterEach(() => vi.unstubAllGlobals());
 
@@ -36,7 +36,7 @@ describe("App", () => {
     const stream = controlledStream();
     const fetchMock = mockServer(() => new Response(stream.body, { headers: { "Content-Type": "text/event-stream" } }));
     const user = userEvent.setup();
-    render(<App />);
+    render(<DecidePage />);
     await writeYesNoQuestion(user);
     await user.click(screen.getByRole("button", { name: "Add question" }));
     await user.type(screen.getByRole("textbox", { name: "Question 2" }), "How angry?");
@@ -93,7 +93,7 @@ describe("App", () => {
       return new Response(stream.body);
     });
     const user = userEvent.setup();
-    render(<App />);
+    render(<DecidePage />);
     await writeYesNoQuestion(user);
 
     await user.click(screen.getByRole("button", { name: "Ask" }));
@@ -108,7 +108,7 @@ describe("App", () => {
   it("shows a refused request's reason", async () => {
     mockServer(() => Response.json({ detail: "Laya's files are not in /nowhere; set LAYA_MODEL_PATH in .env." }, { status: 503 }));
     const user = userEvent.setup();
-    render(<App />);
+    render(<DecidePage />);
     await writeYesNoQuestion(user);
 
     await user.click(screen.getByRole("button", { name: "Ask" }));
@@ -119,7 +119,7 @@ describe("App", () => {
   it("will not ask until the questions are complete, and says what is missing", async () => {
     const fetchMock = mockServer(() => Response.json({}));
     const user = userEvent.setup();
-    render(<App />);
+    render(<DecidePage />);
 
     expect(screen.getByRole("button", { name: "Ask" })).toBeDisabled();
     expect(screen.getByText("Write the text to judge")).toBeInTheDocument();
@@ -131,7 +131,7 @@ describe("App", () => {
   it("adds a template's question with its options", async () => {
     mockServer(() => Response.json({}));
     const user = userEvent.setup();
-    render(<App />);
+    render(<DecidePage />);
 
     await user.click(screen.getByRole("button", { name: "Topic" }));
 
@@ -143,11 +143,11 @@ describe("App", () => {
   it("remembers the text and questions after a reload", async () => {
     mockServer(() => Response.json({}));
     const user = userEvent.setup();
-    const { unmount } = render(<App />);
+    const { unmount } = render(<DecidePage />);
     await writeYesNoQuestion(user);
     unmount();
 
-    render(<App />);
+    render(<DecidePage />);
 
     expect(screen.getByLabelText(/Text to judge/)).toHaveValue("The parcel never arrived.");
     expect(screen.getByRole("textbox", { name: "Question 1" })).toHaveValue("Is the writer unhappy?");

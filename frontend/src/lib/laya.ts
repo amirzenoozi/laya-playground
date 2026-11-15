@@ -1,6 +1,7 @@
-// Sends questions to the server and reads its Server-Sent Events as they arrive.
+// Laya's side: sends questions and reads the answers as they arrive.
 
 import type { AskBody } from "./questions";
+import { isRecord, postEvents } from "./sse";
 
 export interface Probability {
   label: string;
@@ -23,10 +24,6 @@ export type AskEvent =
   | { type: "done"; totalMs: number }
   | { type: "error"; message: string; traceId?: string };
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
 function isAnswer(value: unknown): value is Answer {
   return isRecord(value) && typeof value.index === "number" && typeof value.winner === "string" && Array.isArray(value.probabilities);
 }
@@ -36,9 +33,9 @@ function statusEvent(data: Record<string, unknown>): AskEvent | null {
   return data.state === "ready" ? { type: "ready", loadMs: Number(data.load_ms) } : null;
 }
 
-function errorEvent(data: Record<string, unknown>): AskEvent {
+export function errorEvent(data: Record<string, unknown>): { type: "error"; message: string; traceId?: string } {
   const traceId = typeof data.trace_id === "string" ? data.trace_id : undefined;
-  return { type: "error", message: String(data.message ?? "Laya could not answer"), traceId };
+  return { type: "error", message: String(data.message ?? "Something went wrong"), traceId };
 }
 
 export function toEvent(name: string, data: unknown): AskEvent | null {
@@ -57,62 +54,19 @@ export function toEvent(name: string, data: unknown): AskEvent | null {
   }
 }
 
-function parseBlock(block: string): AskEvent | null {
-  let name = "message";
-  const data: string[] = [];
-  for (const line of block.split("\n")) {
-    if (line.startsWith("event:")) name = line.slice(6).trim();
-    else if (line.startsWith("data:")) data.push(line.slice(5).trim());
-  }
-  try {
-    return toEvent(name, JSON.parse(data.join("\n")));
-  } catch {
-    return null;
-  }
-}
-
-// Keeps any unfinished block for the next chunk; a block ends with a blank line.
-export function splitEvents(buffer: string): { events: AskEvent[]; rest: string } {
-  const blocks = buffer.replace(/\r\n/g, "\n").split("\n\n");
-  const rest = blocks.pop() ?? "";
-  const events = blocks.map(parseBlock).filter((event): event is AskEvent => event !== null);
-  return { events, rest };
-}
-
-// FastAPI answers a refused request with {"detail": "..."} or, for invalid fields, {"detail": [{"msg": ...}]}.
-async function refusal(response: Response): Promise<string> {
-  try {
-    const body: unknown = await response.json();
-    const detail = isRecord(body) ? body.detail : undefined;
-    if (typeof detail === "string") return detail;
-    const first: unknown = Array.isArray(detail) ? detail[0] : undefined;
-    if (isRecord(first) && typeof first.msg === "string") return first.msg;
-  } catch {
-    // Not JSON: fall through to the status
-  }
-  return `The server answered ${response.status}`;
-}
-
-export async function ask(body: AskBody, onEvent: (event: AskEvent) => void, signal: AbortSignal): Promise<void> {
-  const response = await fetch("/api/ask", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+export function ask(body: AskBody, onEvent: (event: AskEvent) => void, signal: AbortSignal): Promise<void> {
+  return postEvents(
+    "/api/ask",
+    body,
+    {
+      onEvent: ({ name, data }) => {
+        const event = toEvent(name, data);
+        if (event) onEvent(event);
+      },
+      onRefused: (message) => onEvent({ type: "error", message }),
+    },
     signal,
-  });
-  if (!response.ok || !response.body) {
-    onEvent({ type: "error", message: await refusal(response) });
-    return;
-  }
-  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
-  let buffer = "";
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    const { events, rest } = splitEvents(buffer + value);
-    buffer = rest;
-    events.forEach(onEvent);
-  }
+  );
 }
 
 export interface Status {

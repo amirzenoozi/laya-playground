@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AskBody } from "./questions";
-import { ask, type Answer, type AskEvent } from "./stream";
+import { ask, type Answer, type AskEvent } from "./laya";
 
 export type Phase = "idle" | "running" | "done" | "failed" | "stopped";
 

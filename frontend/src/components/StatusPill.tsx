@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchStatus, type Status } from "../lib/stream";
+import { fetchStatus, type Status } from "../lib/laya";
 
 type Loaded = { state: "pending" } | { state: "failed" } | { state: "settled"; status: Status };
 

@@ -1,9 +1,9 @@
 import { Braces, Check, Plus, Send, Square } from "lucide-react";
 import { useEffect, useState, type KeyboardEvent } from "react";
-import { AnswersPanel } from "./components/AnswersPanel";
-import { QuestionCard } from "./components/QuestionCard";
-import { StatusPill } from "./components/StatusPill";
-import { fieldClass, primaryButtonClass, secondaryButtonClass } from "./components/ui";
+import { AnswersPanel } from "./AnswersPanel";
+import { QuestionCard } from "./QuestionCard";
+import { StatusPill } from "./StatusPill";
+import { fieldClass, primaryButtonClass, secondaryButtonClass } from "./ui";
 import {
   askBody,
   askProblem,
@@ -14,9 +14,9 @@ import {
   newId,
   TEMPLATES,
   type QuestionDraft,
-} from "./lib/questions";
-import { loadDraft, saveDraft } from "./lib/storage";
-import { useAsk } from "./lib/useAsk";
+} from "../lib/questions";
+import { loadDraft, saveDraft } from "../lib/storage";
+import { useAsk } from "../lib/useAsk";
 
 function JsonView({ text, questions }: { text: string; questions: QuestionDraft[] }) {
   const [copied, setCopied] = useState(false);
@@ -47,7 +47,7 @@ function useDraft() {
   return { text, setText, questions, setQuestions };
 }
 
-export function App() {
+export function DecidePage() {
   const { text, setText, questions, setQuestions } = useDraft();
   const [showJson, setShowJson] = useState(false);
   const { run, start, stop } = useAsk();
@@ -68,16 +68,15 @@ export function App() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6" onKeyDown={onKeyDown}>
-      <header className="mb-6 flex flex-wrap items-center gap-3">
-        <h1 className="text-xl font-semibold">Laya playground</h1>
-        <p className="text-sm text-stone-500">Ask a small decision model typed questions about a text.</p>
+    <div onKeyDown={onKeyDown}>
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <p className="text-sm text-stone-500">Ask Laya, a small decision model, typed questions about a text.</p>
         <div className="ml-auto">
           <StatusPill refresh={run.phase} />
         </div>
-      </header>
+      </div>
 
-      <main className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         <section aria-label="Ask" className="space-y-4">
           <div>
             <label htmlFor="text" className="mb-1 flex justify-between text-sm font-medium">
@@ -142,7 +141,7 @@ export function App() {
           <h2 className="mb-3 text-sm font-medium">Answers</h2>
           <AnswersPanel run={run} onRetry={retry} />
         </section>
-      </main>
+      </div>
     </div>
   );
 }
