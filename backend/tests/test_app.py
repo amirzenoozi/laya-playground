@@ -3,10 +3,12 @@ import logging
 import threading
 from pathlib import Path
 
+import httpx
 import pytest
 from fastapi.testclient import TestClient
 
 from app import create_app
+from ollama import OllamaClient
 from laya_runner import AnswerRejected, LayaError, LayaRunner, RawAnswers
 from settings import CHECKPOINT_FILE, Settings
 
@@ -43,11 +45,12 @@ class FakeAgent:
 class Fakes:
     def __init__(self, tmp_path: Path, keep_alive: int = 300) -> None:
         (tmp_path / CHECKPOINT_FILE).write_text("{}")
-        self.settings = Settings(model_path=tmp_path, keep_alive=keep_alive, threads=1)
+        self.settings = Settings(model_path=tmp_path, keep_alive=keep_alive, threads=1, ollama_url="http://ollama", ollama_keep_alive="5m")
         self.agents: list[FakeAgent] = []
         self.next_fail: Exception | None = None
         self.runner = LayaRunner(self.start, keep_alive)
-        self.client = TestClient(create_app(self.settings, self.runner))
+        unused = OllamaClient("http://ollama", "5m", transport=httpx.MockTransport(lambda request: httpx.Response(503)))
+        self.client = TestClient(create_app(self.settings, self.runner, unused))
 
     def start(self) -> FakeAgent:
         agent = FakeAgent(self.next_fail)

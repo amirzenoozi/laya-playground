@@ -8,7 +8,7 @@ from settings import ROOT, load_settings
 @pytest.fixture(autouse=True)
 def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("settings.load_dotenv", lambda path: None)
-    for name in ("LAYA_MODEL_PATH", "LAYA_KEEP_ALIVE", "LAYA_THREADS"):
+    for name in ("LAYA_MODEL_PATH", "LAYA_KEEP_ALIVE", "LAYA_THREADS", "OLLAMA_URL", "OLLAMA_KEEP_ALIVE"):
         monkeypatch.delenv(name, raising=False)
 
 
@@ -37,3 +37,22 @@ def test_an_invalid_number_falls_back_to_its_default(monkeypatch: pytest.MonkeyP
 
     assert settings.keep_alive == 300
     assert settings.threads == 1
+
+
+def test_ollama_defaults() -> None:
+    settings = load_settings()
+
+    assert (settings.ollama_url, settings.ollama_keep_alive) == ("http://127.0.0.1:11434", "5m")
+
+
+@pytest.mark.parametrize(("typed", "sent"), [("300", 300), ("-1", -1), ("30s", "30s"), ("1h", "1h"), ("five", "5m"), ("5 m", "5m")])
+def test_ollama_keep_alive_sends_seconds_as_a_number(monkeypatch: pytest.MonkeyPatch, typed: str, sent: str | int) -> None:
+    monkeypatch.setenv("OLLAMA_KEEP_ALIVE", typed)
+
+    assert load_settings().ollama_keep_alive == sent
+
+
+def test_ollama_url_loses_a_trailing_slash(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("OLLAMA_URL", "http://studio.local:11434/")
+
+    assert load_settings().ollama_url == "http://studio.local:11434"

@@ -562,6 +562,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "laya" },
     { name = "python-dotenv" },
     { name = "uvicorn" },
@@ -569,7 +570,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "httpx" },
     { name = "mypy" },
     { name = "pytest" },
 ]
@@ -577,6 +577,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115" },
+    { name = "httpx", specifier = ">=0.27" },
     { name = "laya", specifier = ">=0.4.28" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "uvicorn", specifier = ">=0.30" },
@@ -584,7 +585,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "httpx", specifier = ">=0.27" },
     { name = "mypy", specifier = ">=1.11" },
     { name = "pytest", specifier = ">=8.3" },
 ]
